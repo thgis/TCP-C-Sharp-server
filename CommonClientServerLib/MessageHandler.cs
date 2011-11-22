@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web.Script.Serialization;
 using CommonClientServerLib.Messages;
 
 namespace CommonClientServerLib
@@ -24,6 +25,17 @@ namespace CommonClientServerLib
 
         public MessageHandler()
         {
+        }
+
+        public void DecodePacketJson(List<byte> data, ClientInfo clientInfo)
+        {
+            IComMessage msg;
+            JavaScriptSerializer JSR = new JavaScriptSerializer();
+
+            msg = JSR.Deserialize<JsonUserLogOn>(Encoding.ASCII.GetString(data.ToArray()));
+
+            if(MessageReceived != null)
+                MessageReceived(this, new MessageEvent(msg,clientInfo));
         }
 
         public void DecodePacket(List<byte> temp, ClientInfo clientID)

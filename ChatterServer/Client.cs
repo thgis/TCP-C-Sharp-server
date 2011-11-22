@@ -37,7 +37,8 @@ namespace ChatterServer
 
         void packetHandler_CompletePacketReceived(object sender, CompletePacketReceivedArgs args)
         {
-            messageHandler.DecodePacket(args.Data, clientInfo);
+            //messageHandler.DecodePacket(args.Data, clientInfo);
+            messageHandler.DecodePacketJson(args.Data, clientInfo);
         }
 
         public ClientInfo ClientInfo
@@ -62,7 +63,7 @@ namespace ChatterServer
         public void SendMessage(string msg)
         {
             // Convert the reply to byte array
-            byte[] byData = System.Text.Encoding.UTF8.GetBytes(msg);
+            byte[] byData =  System.Text.Encoding.UTF8.GetBytes(msg);
 
             Socket.Send(byData);
         }
@@ -81,9 +82,9 @@ namespace ChatterServer
                 if (!SocketConnected(Socket))
                     throw new SocketException((int)SocketError.ConnectionReset);
 
-                foreach (byte item in dataBuffer)
+                for (int i = 0; i < iRx; i++)
                 {
-                    packetHandler.DetectPacket(item);
+                    packetHandler.DetectPacket(dataBuffer[i]);
                 }
                 // Continue the waiting for data on the Socket
                 WaitForData();

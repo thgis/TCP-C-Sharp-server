@@ -5,9 +5,9 @@ using System.Text;
 
 namespace CommonClientServerLib.Messages
 {
-    public class UserLoggedOnMessage : IComMessage
+    public class JsonUserLogOn : IComMessage
     {
-        public string Username { get; set; }
+        public string UserName { get; set; }
 
         #region IComMessage Members
 
@@ -18,12 +18,9 @@ namespace CommonClientServerLib.Messages
 
         public void deserialize(List<byte> data)
         {
-            string[] msgs = Encoding.UTF8.GetString(data.ToArray()).Split(':');
-            Username = msgs[1];
+            throw new NotImplementedException();
         }
-        /// <summary>
-        /// Returns messagetype
-        /// </summary>
+
         public MessageType Id
         {
             get { return MessageType.USER; }

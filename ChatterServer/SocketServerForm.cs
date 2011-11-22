@@ -50,7 +50,7 @@ namespace ChatterServer
                     break;
                 case MessageType.USER:
                     {
-                    UserLoggedOnMessage userMsg = (UserLoggedOnMessage)msg;
+                    JsonUserLogOn userMsg = (JsonUserLogOn)msg;
                     Add(message.ClientID, listBoxClientList);
                     SetTextboxMsg(message.ClientID.Name + " connected.", textBoxMsg);
                     }

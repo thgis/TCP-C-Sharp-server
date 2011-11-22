@@ -35,6 +35,9 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Web.Extensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -49,6 +52,7 @@
     <Compile Include="EventArgs.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="Messages\IComMessage.cs" />
+    <Compile Include="Messages\JsonUserLogOn.cs" />
     <Compile Include="Messages\MessageEvent.cs" />
     <Compile Include="Messages\TextMessage.cs" />
     <Compile Include="Messages\UserLoggedOnMessage.cs" />

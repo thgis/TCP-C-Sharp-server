@@ -64,6 +64,16 @@ namespace CommonClientServerLib
             {
                 _status = StreamsStatus.SECOND_END_RECEIVED;
                 _completePacket.Add(dataByte);
+
+                List<Byte> _temp = new List<Byte>(_completePacket.Count - 3);
+                _temp.AddRange(_completePacket.GetRange(1, _completePacket.Count - 3));
+
+                CompletePacketReceivedArgs args = new CompletePacketReceivedArgs(_temp);
+                if (CompletePacketReceived != null)
+                    CompletePacketReceived(this, args);
+
+                _status = StreamsStatus.HOLE_PACKET_RECEIVED;
+                resetStream();
             }
             else if (_status == StreamsStatus.FIRST_END_RECEIVED && dataByte == 0x10)
             {
@@ -80,18 +90,6 @@ namespace CommonClientServerLib
                     case StreamsStatus.RECEIVING_DATA:
                         _completePacket.Add(dataByte);
                         break;
-                    case StreamsStatus.SECOND_END_RECEIVED:
-                        List<Byte> _temp = new List<Byte>(_completePacket.Count - 3);
-                        _temp.AddRange(_completePacket.GetRange(1,_completePacket.Count - 3));
-
-                        CompletePacketReceivedArgs args = new CompletePacketReceivedArgs(_temp);
-                        if (CompletePacketReceived != null)
-                            CompletePacketReceived(this, args);
-
-                        _status = StreamsStatus.HOLE_PACKET_RECEIVED;
-                        resetStream();
-                        break;
-
                     default:
                         resetStream();
                         break;

@@ -97,7 +97,7 @@ namespace ChatterServer
         {
             if (message.GetMessage.Id == MessageType.USER)
             {
-                message.ClientID.Name = ((UserLoggedOnMessage)message.GetMessage).Name;
+                message.ClientID.Name = ((JsonUserLogOn)message.GetMessage).UserName;
             }
 
             if (clientReceivedMessageEvent != null)
