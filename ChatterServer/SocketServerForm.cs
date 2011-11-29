@@ -50,10 +50,19 @@ namespace ChatterServer
                     break;
                 case MessageType.USER:
                     {
-                    JsonUserLogOn userMsg = (JsonUserLogOn)msg;
-                    Add(message.ClientID, listBoxClientList);
-                    SetTextboxMsg(message.ClientID.Name + " connected.", textBoxMsg);
+                        UserLogOn userMsg = (UserLogOn)msg;
+                        Add(message.ClientID, listBoxClientList);
+                        SetTextboxMsg(message.ClientID.Name + " connected.", textBoxMsg);
+                        
                     }
+                    break;
+                case MessageType.GETONLINEPEOPLE:
+                    GetOnlineUsers gou = (GetOnlineUsers)msg;
+                    foreach (ListViewItem item in listBoxClientList.Items)
+                    {
+                        gou.Users.Add(item.Text);
+                    }
+                    server.SendMsgToClient(gou,message.ClientID);
                     break;
                 case MessageType.NOMATCHINGTYPE:
                     break;
@@ -148,7 +157,14 @@ namespace ChatterServer
                 return;
             }
             ClientInfo client = (ClientInfo)listBoxClientList.Items[listBoxClientList.SelectedIndex];
-            server.SendMsgToClient(richTextBoxSendMsg.Text, client.ID);
+            
+            TextMessage msg = new TextMessage();
+            msg.Sender = "Server";
+            msg.Receiver = client.ID.ToString();
+            msg.Text = richTextBoxSendMsg.Text;
+
+            server.SendMsgToClient(msg, client);
+            
             richTextBoxSendMsg.Text = "";
 		}
 		
@@ -174,10 +190,12 @@ namespace ChatterServer
         {
             try
             {
-                string msg = richTextBoxSendMsg.Text;
-                richTextBoxSendMsg.Text = "";
-                msg = "Server Msg: " + msg;
+                TextMessage msg = new TextMessage();
+                msg.Sender = "Server";
+                msg.Text = richTextBoxSendMsg.Text;
                 server.BroadcastMsg(msg);
+
+                richTextBoxSendMsg.Text = "";
             }
             catch (Exception se)
             {

@@ -60,10 +60,9 @@ namespace ChatterServer
             }
         }
 
-        public void SendMessage(string msg)
+        public void SendMessage(IComMessage msg)
         {
-            // Convert the reply to byte array
-            byte[] byData =  System.Text.Encoding.UTF8.GetBytes(msg);
+            byte[] byData = messageHandler.EncodePacket(msg);
 
             Socket.Send(byData);
         }

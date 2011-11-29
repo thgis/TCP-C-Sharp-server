@@ -10,16 +10,8 @@ namespace CommonClientServerLib.Messages
         #region IComMessage Members
 
         public string Text { get; set; }
-
-        public byte[] serialize()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void deserialize(List<byte> data)
-        {
-            Text = Encoding.UTF8.GetString(data.ToArray());
-        }
+        public string Receiver { get; set; }
+        public string Sender { get; set; }
 
         public MessageType Id
         {

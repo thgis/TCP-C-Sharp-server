@@ -97,7 +97,7 @@ namespace ChatterServer
         {
             if (message.GetMessage.Id == MessageType.USER)
             {
-                message.ClientID.Name = ((JsonUserLogOn)message.GetMessage).UserName;
+                message.ClientID.Name = ((UserLogOn)message.GetMessage).UserName;
             }
 
             if (clientReceivedMessageEvent != null)
@@ -126,16 +126,16 @@ namespace ChatterServer
             return id;
         }
 
-        public void SendMsgToClient(string msg, int clientNumber)
+        public void SendMsgToClient(IComMessage msg, ClientInfo Client)
         {
             foreach (Client item in m_workerSocketList)
             {
-                if (item.ClientInfo.ID == clientNumber)
+                if (item.ClientInfo.ID == Client.ID)
                     item.SendMessage(msg);
             }
         }
 
-        public void BroadcastMsg(string msg)
+        public void BroadcastMsg(IComMessage msg)
         {
             foreach (Client item in m_workerSocketList)
             {

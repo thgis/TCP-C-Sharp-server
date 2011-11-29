@@ -17,67 +17,60 @@ namespace CommonClientServerLib
 
     public class MessageHandler
     {
+        IComMessage msg = null;
         /// <summary>
         /// Event that is raised when a Message is received.
         /// </summary>
         public event MessageReceivedHandler MessageReceived;
-
+        JavaScriptSerializer JSR;
 
         public MessageHandler()
         {
+            JSR = new JavaScriptSerializer();
         }
 
         public void DecodePacketJson(List<byte> data, ClientInfo clientInfo)
         {
-            IComMessage msg;
-            JavaScriptSerializer JSR = new JavaScriptSerializer();
+            string msgStr = Encoding.ASCII.GetString(data.ToArray());
 
-            msg = JSR.Deserialize<JsonUserLogOn>(Encoding.ASCII.GetString(data.ToArray()));
+            Dictionary<string, object> test = (Dictionary<string, object>)JSR.DeserializeObject(msgStr);
+
+            MessageType msgType = MessageType.NOMATCHINGTYPE;
+
+            if(test.ContainsKey("Id"))
+                msgType = (MessageType)int.Parse(test["Id"].ToString());
+
+            switch (msgType)
+            {
+                case MessageType.USER:
+                    msg = JSR.Deserialize<UserLogOn>(msgStr);
+                    break;
+                case MessageType.TEXT:
+                    break;
+                case MessageType.GETONLINEPEOPLE:
+                    msg = JSR.Deserialize<GetOnlineUsers>(msgStr);
+                    break;
+                default:
+                    break;
+            }
 
             if(MessageReceived != null)
                 MessageReceived(this, new MessageEvent(msg,clientInfo));
         }
 
-        public void DecodePacket(List<byte> temp, ClientInfo clientID)
+        public byte[] EncodePacket(IComMessage iComMessage)
         {
-            MessageType type = FindMessageType(temp);
-            IComMessage message = null;
+            string msg = JSR.Serialize(iComMessage);
 
-            switch (type)
-            {
-                case MessageType.TEXT:
-                    message = new TextMessage();
-                    break;
-                case MessageType.USER:
-                    message = new UserLoggedOnMessage();
-                    break;
-                case MessageType.NOMATCHINGTYPE:
-                    break;
-                default:
-                    break;
-            }
-            message.deserialize(temp);
-            if(MessageReceived != null)
-                MessageReceived(this,new MessageEvent(message,clientID));
-        }
-
-        private MessageType FindMessageType(List<byte> temp)
-        {
-            MessageType messageType = MessageType.NOMATCHINGTYPE;
-
-            string[] msgs = Encoding.UTF8.GetString(temp.ToArray()).Split(':');
-            if (msgs[0] == "User")
-                messageType = MessageType.USER;
-            else
-                messageType = MessageType.TEXT;
-            return messageType;
+            return Encoding.ASCII.GetBytes(msg);
         }
     }
 
     public enum MessageType
     {
-        TEXT,
-        USER,
-        NOMATCHINGTYPE
+        TEXT = 3,
+        GETONLINEPEOPLE = 2,
+        USER = 1,
+        NOMATCHINGTYPE = 0
     }
 }
