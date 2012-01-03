@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatterServer", "ChatterServer\ChatterServer.csproj", "{DE426060-BE8D-42B5-8988-69A3AD87273F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonClientServerLib", "CommonClientServerLib\CommonClientServerLib.csproj", "{19FAC771-3399-4327-A7CD-0A0D9378EAAD}"
