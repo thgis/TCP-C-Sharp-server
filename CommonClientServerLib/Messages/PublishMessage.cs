@@ -5,17 +5,18 @@ using System.Text;
 
 namespace CommonClientServerLib.Messages
 {
-    public class UserLogOn : BaseMessage, IComMessage
+    public class PublishMessage : BaseMessage, IComMessage
     {
-        public string userName { get; set; }
-        public bool success { get; set; }
+        public string message { get; set; }
+        public string receiver { get; set; }
+        public string sender { get; set; }
+
         #region IComMessage Members
 
         public MessageType type
         {
-            get { return MessageType.USERLOGON; }
+            get { return MessageType.TEXT; }
         }
-
         #endregion
     }
 }

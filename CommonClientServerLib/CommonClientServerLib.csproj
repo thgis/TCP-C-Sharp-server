@@ -51,12 +51,13 @@
     <Compile Include="ClientInfo.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="MessageHandler.cs" />
+    <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\GetOnlineUsers.cs" />
     <Compile Include="Messages\IComMessage.cs" />
     <Compile Include="Messages\UserLogOn.cs" />
     <Compile Include="Messages\MessageEvent.cs" />
-    <Compile Include="Messages\TextMessage.cs" />
-    <Compile Include="Messages\UserLoggedOnMessage.cs" />
+    <Compile Include="Messages\PublishMessage.cs" />
+    <Compile Include="Messages\NewUserOnline.cs" />
     <Compile Include="NetHelper.cs" />
     <Compile Include="PacketHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

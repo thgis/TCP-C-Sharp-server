@@ -40,15 +40,15 @@ namespace ChatterServer
         {
             IComMessage msg = message.GetMessage;
 
-            switch (msg.Id)
+            switch (msg.type)
             {
                 case MessageType.TEXT:
                     {
-                        TextMessage textmsg = (TextMessage)msg;
-                        AppendToRichEditControl(message.ClientID.Name + " wrote: " + textmsg.Text + Environment.NewLine,richTextBoxReceivedMsg);
+                        PublishMessage textmsg = (PublishMessage)msg;
+                        AppendToRichEditControl(message.ClientID.Name + " wrote: " + textmsg.message + Environment.NewLine,richTextBoxReceivedMsg);
                     }
                     break;
-                case MessageType.USER:
+                case MessageType.USERLOGON:
                     {
                         UserLogOn userMsg = (UserLogOn)msg;
                         Add(message.ClientID, listBoxClientList);
@@ -56,11 +56,11 @@ namespace ChatterServer
                         
                     }
                     break;
-                case MessageType.GETONLINEPEOPLE:
+                case MessageType.GETONLINEUSERS:
                     GetOnlineUsers gou = (GetOnlineUsers)msg;
                     foreach (ListViewItem item in listBoxClientList.Items)
                     {
-                        gou.Users.Add(item.Text);
+                        gou.users.Add(item.Text);
                     }
                     server.SendMsgToClient(gou,message.ClientID);
                     break;
@@ -158,10 +158,10 @@ namespace ChatterServer
             }
             ClientInfo client = (ClientInfo)listBoxClientList.Items[listBoxClientList.SelectedIndex];
             
-            TextMessage msg = new TextMessage();
-            msg.Sender = "Server";
-            msg.Receiver = client.ID.ToString();
-            msg.Text = richTextBoxSendMsg.Text;
+            PublishMessage msg = new PublishMessage();
+            msg.sender = "Server";
+            msg.receiver = client.ID.ToString();
+            msg.message = richTextBoxSendMsg.Text;
 
             server.SendMsgToClient(msg, client);
             
@@ -190,9 +190,9 @@ namespace ChatterServer
         {
             try
             {
-                TextMessage msg = new TextMessage();
-                msg.Sender = "Server";
-                msg.Text = richTextBoxSendMsg.Text;
+                PublishMessage msg = new PublishMessage();
+                msg.sender = "Server";
+                msg.message = richTextBoxSendMsg.Text;
                 server.BroadcastMsg(msg);
 
                 richTextBoxSendMsg.Text = "";

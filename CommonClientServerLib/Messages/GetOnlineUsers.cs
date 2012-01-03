@@ -5,15 +5,15 @@ using System.Text;
 
 namespace CommonClientServerLib.Messages
 {
-    public class GetOnlineUsers : IComMessage
+    public class GetOnlineUsers : BaseMessage, IComMessage
     {
-        public List<string> Users { get; set; }
+        public List<string> users { get; set; }
 
         #region IComMessage Members
 
-        public MessageType Id
+        public MessageType type
         {
-            get { return MessageType.GETONLINEPEOPLE; }
+            get { return MessageType.GETONLINEUSERS; }
         }
 
         #endregion

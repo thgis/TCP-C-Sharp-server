@@ -37,17 +37,18 @@ namespace CommonClientServerLib
 
             MessageType msgType = MessageType.NOMATCHINGTYPE;
 
-            if(test.ContainsKey("Id"))
-                msgType = (MessageType)int.Parse(test["Id"].ToString());
+            if (test.ContainsKey("type"))
+                msgType = (MessageType)int.Parse(test["type"].ToString());
 
             switch (msgType)
             {
-                case MessageType.USER:
+                case MessageType.USERLOGON:
                     msg = JSR.Deserialize<UserLogOn>(msgStr);
                     break;
                 case MessageType.TEXT:
+                    msg = JSR.Deserialize<PublishMessage>(msgStr);
                     break;
-                case MessageType.GETONLINEPEOPLE:
+                case MessageType.GETONLINEUSERS:
                     msg = JSR.Deserialize<GetOnlineUsers>(msgStr);
                     break;
                 default:
@@ -62,15 +63,22 @@ namespace CommonClientServerLib
         {
             string msg = JSR.Serialize(iComMessage);
 
-            return Encoding.ASCII.GetBytes(msg);
+            List<byte> list = new List<byte>();
+            list.Add(0x02);
+            list.AddRange(Encoding.ASCII.GetBytes(msg));
+            list.Add(0x10);
+            list.Add(0x03);
+
+            return list.ToArray();
         }
     }
 
     public enum MessageType
     {
-        TEXT = 3,
-        GETONLINEPEOPLE = 2,
-        USER = 1,
+        NEWUSERONLINE = 3,
+        TEXT = 4,
+        GETONLINEUSERS = 2,
+        USERLOGON = 1,
         NOMATCHINGTYPE = 0
     }
 }

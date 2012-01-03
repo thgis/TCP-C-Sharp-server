@@ -10,6 +10,6 @@ namespace CommonClientServerLib.Messages
         /// <summary>
         /// Property to get the ID.
         /// </summary>
-        MessageType Id { get; }
+        MessageType type { get; }
     }
 }

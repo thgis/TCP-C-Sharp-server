@@ -95,9 +95,14 @@ namespace ChatterServer
 
         void GetMessageHandler_MessageReceived(object sender, CommonClientServerLib.Messages.MessageEvent message)
         {
-            if (message.GetMessage.Id == MessageType.USER)
+            if (message.GetMessage.type == MessageType.USERLOGON)
             {
-                message.ClientID.Name = ((UserLogOn)message.GetMessage).UserName;
+                message.ClientID.Name = ((UserLogOn)message.GetMessage).userName;
+
+                UserLogOn returnMsg = (UserLogOn)message.GetMessage;
+                returnMsg.success = true;
+
+                SendMsgToClient(returnMsg, message.ClientID);
             }
 
             if (clientReceivedMessageEvent != null)
@@ -137,7 +142,7 @@ namespace ChatterServer
 
         public void BroadcastMsg(IComMessage msg)
         {
-            foreach (Client item in m_workerSocketList)
+            foreach (Client item in m_workerSocketList.ToArray())
             {
                 item.SendMessage(msg);
             }
