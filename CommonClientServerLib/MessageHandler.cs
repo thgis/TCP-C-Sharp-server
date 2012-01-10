@@ -27,8 +27,8 @@ namespace CommonClientServerLib
                 case MessageType.USERLOGON:
                     msg = JSR.Deserialize<UserLogOn>(msgStr);
                     break;
-                case MessageType.TEXT:
-                    msg = JSR.Deserialize<PublishMessage>(msgStr);
+                case MessageType.SENDMESSAGE:
+                    msg = JSR.Deserialize<SendMessage>(msgStr);
                     break;
                 case MessageType.GETONLINEUSERS:
                     msg = JSR.Deserialize<GetOnlineUsers>(msgStr);
@@ -55,9 +55,10 @@ namespace CommonClientServerLib
     }
 
     public enum MessageType
-    {
+    {        
+        SENDMESSAGE = 5,
+        PUBLISHMESSAGE = 4,
         NEWUSERONLINE = 3,
-        TEXT = 4,
         GETONLINEUSERS = 2,
         USERLOGON = 1,
         NOMATCHINGTYPE = 0

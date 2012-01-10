@@ -8,5 +8,6 @@ namespace CommonClientServerLib.Messages
     public abstract class BaseMessage
     {
         public string errorMessage { get; set; }
+        public long timeStamp { get; set; }
     }
 }

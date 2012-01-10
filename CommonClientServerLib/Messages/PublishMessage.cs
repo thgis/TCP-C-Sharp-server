@@ -8,6 +8,7 @@ namespace CommonClientServerLib.Messages
     public class PublishMessage : BaseMessage, IComMessage
     {
         public string message { get; set; }
+        public long timeStamp { get; set; }
         public string receiver { get; set; }
         public string sender { get; set; }
 
@@ -15,7 +16,7 @@ namespace CommonClientServerLib.Messages
 
         public MessageType type
         {
-            get { return MessageType.TEXT; }
+            get { return MessageType.PUBLISHMESSAGE; }
         }
         #endregion
     }

@@ -42,12 +42,15 @@ namespace ChatterServer
 
             switch (msg.type)
             {
-                case MessageType.TEXT:
+                case MessageType.SENDMESSAGE:
                     {
-                        PublishMessage textmsg = (PublishMessage)msg;
-                        AppendToRichEditControl(message.ClientID.Name + " wrote: " + textmsg.message + Environment.NewLine,richTextBoxReceivedMsg);
-                        textmsg.sender = message.ClientID.Name;
-                        server.BroadcastMsg(textmsg);
+                        SendMessage sendMessage = (SendMessage)msg;
+                        PublishMessage pbMsg = new PublishMessage();
+                        pbMsg.message = sendMessage.message;
+
+                        AppendToRichEditControl(message.ClientID.Name + " wrote: " + pbMsg.message + Environment.NewLine, richTextBoxReceivedMsg);
+                        pbMsg.sender = message.ClientID.Name;
+                        server.BroadcastMsg(pbMsg);
                     }
                     break;
                 case MessageType.USERLOGON:
