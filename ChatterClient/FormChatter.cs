@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Web.Script.Serialization;
 using CommonClientServerLib.Messages;
+using CommonClientServerLib;
 
 namespace ChatterClient
 {
@@ -84,12 +85,28 @@ namespace ChatterClient
                 UpdateControls(false);
             }
         }
+
+
+
         void ButtonSendMessageClick(object sender, System.EventArgs e)
         {
             string msg = richTextTxMessage.Text;
             richTextTxMessage.Text = "";
-            SendMessage(msg);
+
+            SendMessage SMessage = new SendMessage();
+            SMessage.message = msg;
+
+            byte[] data = MessageHandler.EncodePacket(SMessage);
+
+           
+
+
+            m_clientSocket.Send(data);
+
+           // SendMessage(msg2);
         }
+
+
         public void WaitForData()
         {
             try
