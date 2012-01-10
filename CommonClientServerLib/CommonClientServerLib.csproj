@@ -75,6 +75,7 @@
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\GetOnlineUsers.cs" />
     <Compile Include="Messages\IComMessage.cs" />
+    <Compile Include="Messages\SendMessage.cs" />
     <Compile Include="Messages\UserLogOn.cs" />
     <Compile Include="Messages\MessageEvent.cs" />
     <Compile Include="Messages\PublishMessage.cs" />
