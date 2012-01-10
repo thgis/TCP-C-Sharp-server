@@ -47,8 +47,8 @@ namespace ChatterServer
                         SendMessage sendMessage = (SendMessage)msg;
                         PublishMessage pbMsg = new PublishMessage();
                         pbMsg.message = sendMessage.message;
-                        pbMsg.sender = message.ClientID.Name;
-                        pbMsg.timeStamp = DateTime.Now.ToBinary();
+                        pbMsg.sender = sendMessage.sender;
+                        pbMsg.timeStamp = (long)(DateTime.UtcNow - new DateTime(1970,1,1)).TotalMilliseconds;
 
                         AppendToRichEditControl(message.ClientID.Name + " wrote: " + pbMsg.message + Environment.NewLine, richTextBoxReceivedMsg);
                         
