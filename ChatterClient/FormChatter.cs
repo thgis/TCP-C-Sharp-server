@@ -92,16 +92,16 @@ namespace ChatterClient
         {
             string msg = richTextTxMessage.Text;
             richTextTxMessage.Text = "";
-            
-            PublishMessage PBMessage =new CommonClientServerLib.Messages.PublishMessage();
-            PBMessage.message = msg;
 
-            MessageHandler.EncodePacket(PBMessage);
+            SendMessage SMessage = new SendMessage();
+            SMessage.message = msg;
+
+            byte[] data = MessageHandler.EncodePacket(SMessage);
 
            
 
 
-            m_clientSocket.Send(data.ToArray());
+            m_clientSocket.Send(data);
 
            // SendMessage(msg2);
         }
