@@ -63,7 +63,7 @@ namespace ChatterServer
                 // Create a new client with suplied id and socket
                 Client client = new Client(workerSocket, id);
                 client.DisconnectedEvent += new DisconnectedEvent(client_DisconnectedEvent);
-                client.GetMessageHandler.MessageReceived += new CommonClientServerLib.MessageReceivedHandler(GetMessageHandler_MessageReceived);
+                client.MessageReceived += new MessageReceived(client_MessageReceived);
 				
 				// Add the workerSocket reference to our ArrayList
 				m_workerSocketList.Add(client);
@@ -86,27 +86,29 @@ namespace ChatterServer
 			}	
 		}
 
-        void client_DisconnectedEvent(object sender, EventArgs args)
-        {
-            if (clientDisconnectedEvent != null)
-                clientDisconnectedEvent(this, new ConnectionChangedEventArgs() { ClientInfo = ((Client)sender).ClientInfo });
-            m_workerSocketList.Remove(sender);
-        }
-
-        void GetMessageHandler_MessageReceived(object sender, CommonClientServerLib.Messages.MessageEvent message)
+        void client_MessageReceived(object sender, MessageEvent message)
         {
             if (message.GetMessage.type == MessageType.USERLOGON)
             {
                 message.ClientID.Name = ((UserLogOn)message.GetMessage).userName;
 
                 UserLogOn returnMsg = (UserLogOn)message.GetMessage;
+                returnMsg.id = message.ClientID.ID;
                 returnMsg.success = true;
+                returnMsg.errorMessage = "";
 
                 SendMsgToClient(returnMsg, message.ClientID);
             }
 
             if (clientReceivedMessageEvent != null)
                 clientReceivedMessageEvent(this, message);
+        }
+
+        void client_DisconnectedEvent(object sender, EventArgs args)
+        {
+            if (clientDisconnectedEvent != null)
+                clientDisconnectedEvent(this, new ConnectionChangedEventArgs() { ClientInfo = ((Client)sender).ClientInfo });
+            m_workerSocketList.Remove(sender);
         }
 
         private int GetNextID()

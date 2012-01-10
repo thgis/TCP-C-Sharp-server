@@ -9,6 +9,7 @@ namespace CommonClientServerLib.Messages
     {
         public string userName { get; set; }
         public bool success { get; set; }
+        public int id { get; set; }
         #region IComMessage Members
 
         public MessageType type

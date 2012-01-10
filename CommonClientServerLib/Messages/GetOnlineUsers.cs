@@ -7,7 +7,7 @@ namespace CommonClientServerLib.Messages
 {
     public class GetOnlineUsers : BaseMessage, IComMessage
     {
-        public List<string> users { get; set; }
+        public List<string> userList { get; set; }
 
         #region IComMessage Members
 
