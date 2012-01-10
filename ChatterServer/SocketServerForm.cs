@@ -46,6 +46,8 @@ namespace ChatterServer
                     {
                         PublishMessage textmsg = (PublishMessage)msg;
                         AppendToRichEditControl(message.ClientID.Name + " wrote: " + textmsg.message + Environment.NewLine,richTextBoxReceivedMsg);
+                        textmsg.sender = message.ClientID.Name;
+                        server.BroadcastMsg(textmsg);
                     }
                     break;
                 case MessageType.USERLOGON:
@@ -58,9 +60,10 @@ namespace ChatterServer
                     break;
                 case MessageType.GETONLINEUSERS:
                     GetOnlineUsers gou = (GetOnlineUsers)msg;
-                    foreach (ListViewItem item in listBoxClientList.Items)
+                    gou.userList = new List<string>();
+                    foreach (ClientInfo item in listBoxClientList.Items)
                     {
-                        gou.users.Add(item.Text);
+                        gou.userList.Add(item.Name);
                     }
                     server.SendMsgToClient(gou,message.ClientID);
                     break;

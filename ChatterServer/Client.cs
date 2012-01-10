@@ -7,16 +7,17 @@ using CommonClientServerLib.Messages;
 
 namespace ChatterServer
 {
-    public delegate void DisconnectedEvent(object sender, EventArgs args); 
+    public delegate void DisconnectedEvent(object sender, EventArgs args);
+    public delegate void MessageReceived(object sender, MessageEvent message);
 
     public class Client : IDisposable
     {
         private AsyncCallback pfnWorkerCallBack;
         private PacketHandler packetHandler;
-        private MessageHandler messageHandler;
         private ClientInfo clientInfo;
 
         public event DisconnectedEvent DisconnectedEvent;
+        public event MessageReceived MessageReceived;
 
         public Client(Socket socket, int id)
         {
@@ -24,8 +25,6 @@ namespace ChatterServer
             Socket = socket;
             packetHandler = new PacketHandler();
             packetHandler.CompletePacketReceived += new PacketHandler.CompletePacketReceivedEventHandler(packetHandler_CompletePacketReceived);
-
-            messageHandler = new MessageHandler();
 
             clientInfo = new ClientInfo();
             clientInfo.ID = id;
@@ -37,8 +36,9 @@ namespace ChatterServer
 
         void packetHandler_CompletePacketReceived(object sender, CompletePacketReceivedArgs args)
         {
-            //messageHandler.DecodePacket(args.Data, clientInfo);
-            messageHandler.DecodePacketJson(args.Data, clientInfo);
+            IComMessage msg = MessageHandler.DecodePacketJson(args.Data);
+            if (MessageReceived != null)
+                MessageReceived(this, new MessageEvent(msg, clientInfo));
         }
 
         public ClientInfo ClientInfo
@@ -52,17 +52,9 @@ namespace ChatterServer
         private Socket Socket { get; set; }
         private byte[] dataBuffer { get; set; }
 
-        public MessageHandler GetMessageHandler
-        {
-            get
-            {
-                return messageHandler;
-            }
-        }
-
         public void SendMessage(IComMessage msg)
         {
-            byte[] byData = messageHandler.EncodePacket(msg);
+            byte[] byData = MessageHandler.EncodePacket(msg);
 
             Socket.Send(byData);
         }

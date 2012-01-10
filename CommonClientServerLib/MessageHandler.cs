@@ -7,30 +7,12 @@ using CommonClientServerLib.Messages;
 
 namespace CommonClientServerLib
 {
-
-    /// <summary>
-    /// Delegate to a method used when a message is received.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="message"></param>
-    public delegate void MessageReceivedHandler(object sender, MessageEvent message);
-
     public class MessageHandler
     {
-        IComMessage msg = null;
-        /// <summary>
-        /// Event that is raised when a Message is received.
-        /// </summary>
-        public event MessageReceivedHandler MessageReceived;
-        JavaScriptSerializer JSR;
-
-        public MessageHandler()
+        public static IComMessage DecodePacketJson(List<byte> data)
         {
-            JSR = new JavaScriptSerializer();
-        }
-
-        public void DecodePacketJson(List<byte> data, ClientInfo clientInfo)
-        {
+            JavaScriptSerializer JSR = new JavaScriptSerializer();
+            IComMessage msg = null;
             string msgStr = Encoding.ASCII.GetString(data.ToArray());
 
             Dictionary<string, object> test = (Dictionary<string, object>)JSR.DeserializeObject(msgStr);
@@ -54,13 +36,12 @@ namespace CommonClientServerLib
                 default:
                     break;
             }
-
-            if(MessageReceived != null)
-                MessageReceived(this, new MessageEvent(msg,clientInfo));
+            return msg;
         }
 
-        public byte[] EncodePacket(IComMessage iComMessage)
+        public static byte[] EncodePacket(IComMessage iComMessage)
         {
+            JavaScriptSerializer JSR = new JavaScriptSerializer();
             string msg = JSR.Serialize(iComMessage);
 
             List<byte> list = new List<byte>();
