@@ -49,7 +49,7 @@ namespace CommonClientServerLib
 
             List<byte> list = new List<byte>();
             list.Add(0x02);
-            list.AddRange(Encoding.ASCII.GetBytes(msg));
+            list.AddRange(Encoding.UTF8.GetBytes(msg));
             list.Add(0x10);
             list.Add(0x03);
 
