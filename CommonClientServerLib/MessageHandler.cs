@@ -33,6 +33,9 @@ namespace CommonClientServerLib
                 case MessageType.GETONLINEUSERS:
                     msg = JSR.Deserialize<GetOnlineUsers>(msgStr);
                     break;
+                case MessageType.PUBLISHMESSAGE:
+                    msg = JSR.Deserialize<PublishMessage>(msgStr);
+                    break;
                 default:
                     break;
             }

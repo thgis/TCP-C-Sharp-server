@@ -16,10 +16,7 @@ namespace ChatterClient
 {
     public partial class formChatter : Form
     {
-        IAsyncResult m_result;
-        public AsyncCallback m_pfnCallBack;
-        public Socket m_clientSocket;
-
+        private Client client;
         public delegate void UpdateRichEditCallback(string text);
         public delegate void UpdateControlsCallBack(bool connected);
 
@@ -30,15 +27,54 @@ namespace ChatterClient
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            textBoxIP.Text = GetIP();
+            client = new Client();
+            client.MessageReceived += new MessageReceived(client_MessageReceived);
+            textBoxIP.Text = client.GetIP();
+        }
+
+        void client_MessageReceived(object sender, MessageEvent message)
+        {
+            switch (message.GetMessage.type)
+            {
+                case MessageType.SENDMESSAGE:
+                    break;
+                case MessageType.PUBLISHMESSAGE:
+                    {
+                        string text;
+                        PublishMessage msg = (PublishMessage)message.GetMessage;
+
+                        if (msg.sender == client.UserName)
+                            text = "You say: " + msg.message;
+                        else
+                            text = msg.sender + " says: " + msg.message;
+
+                        AppendToRichEditControl(text);
+                    }
+                    break;
+                case MessageType.NEWUSERONLINE:
+                    break;
+                case MessageType.GETONLINEUSERS:
+                    break;
+                case MessageType.USERLOGON:
+                    {
+                        UserLogOn msg = (UserLogOn)message.GetMessage;
+
+                        AppendToRichEditControl("Welcome " + txtUserName.Text + "! You got the ID " + msg.id);
+                    }
+                    break;
+                case MessageType.NOMATCHINGTYPE:
+                    break;
+                default:
+                    break;
+            }
         }
 
         void ButtonCloseClick(object sender, System.EventArgs e)
         {
-            if (m_clientSocket != null)
+            if (client != null)
             {
-                m_clientSocket.Close();
-                m_clientSocket = null;
+                client.Close();
+                client = null;
             }
             Close();
         }
@@ -58,24 +94,8 @@ namespace ChatterClient
             }
             try
             {
-                UpdateControls(false);
-                // Create the socket instance
-                m_clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                // Cet the remote IP address
-                IPAddress ip = IPAddress.Parse(textBoxIP.Text);
-                int iPortNo = System.Convert.ToInt16(textBoxPort.Text);
-                // Create the end point 
-                IPEndPoint ipEnd = new IPEndPoint(ip, iPortNo);
-                // Connect to the remote host
-                m_clientSocket.Connect(ipEnd);
-                if (m_clientSocket.Connected)
-                {
-                    SendMessage("User:" + txtUserName.Text);
-                    UpdateControls(true);
-                    //Wait for data asynchronously 
-                    WaitForData();
-                }
+                bool result = client.connect(textBoxIP.Text, textBoxPort.Text, txtUserName.Text); 
+                UpdateControls(result);
             }
             catch (SocketException se)
             {
@@ -86,95 +106,17 @@ namespace ChatterClient
             }
         }
 
-
-
         void ButtonSendMessageClick(object sender, System.EventArgs e)
+        {
+            SendTextMsg();
+        }
+
+        private void SendTextMsg()
         {
             string msg = richTextTxMessage.Text;
             richTextTxMessage.Text = "";
 
-            SendMessage SMessage = new SendMessage();
-            SMessage.message = msg;
-
-            byte[] data = MessageHandler.EncodePacket(SMessage);
-
-           
-
-
-            m_clientSocket.Send(data);
-
-           // SendMessage(msg2);
-        }
-
-
-        public void WaitForData()
-        {
-            try
-            {
-                if (m_pfnCallBack == null)
-                {
-                    m_pfnCallBack = new AsyncCallback(OnDataReceived);
-                }
-                SocketPacket theSocPkt = new SocketPacket();
-                theSocPkt.thisSocket = m_clientSocket;
-                // Start listening to the data asynchronously
-                m_result = m_clientSocket.BeginReceive(theSocPkt.dataBuffer,
-                                                        0, theSocPkt.dataBuffer.Length,
-                                                        SocketFlags.None,
-                                                        m_pfnCallBack,
-                                                        theSocPkt);
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message);
-            }
-
-        }
-        public class SocketPacket
-        {
-            public System.Net.Sockets.Socket thisSocket;
-            public byte[] dataBuffer = new byte[1024];
-        }
-
-        bool SocketConnected(Socket socket)
-        {
-            bool part1 = socket.Poll(1000, SelectMode.SelectRead);
-            bool part2 = (socket.Available == 0);
-            if (part1 & part2)
-                return false;
-            else
-                return true;
-        }
-
-        public void OnDataReceived(IAsyncResult asyn)
-        {
-            try
-            {
-                SocketPacket theSockId = (SocketPacket)asyn.AsyncState;
-
-                int iRx = theSockId.thisSocket.EndReceive(asyn);
-                String szData = Encoding.UTF8.GetString(theSockId.dataBuffer, 0, iRx);
-                AppendToRichEditControl(szData);
-                if (SocketConnected(theSockId.thisSocket))
-                    WaitForData();
-                else
-                    throw new SocketException((int)SocketError.ConnectionReset);
-            }
-            catch (ObjectDisposedException)
-            {
-                System.Diagnostics.Debugger.Log(0, "1", "\nOnDataReceived: Socket has been closed\n");
-            }
-            catch (SocketException se)
-            {
-                if (se.SocketErrorCode == SocketError.ConnectionReset)
-                {
-                    object[] pList = { false };
-                    this.BeginInvoke(new UpdateControlsCallBack(UpdateControls), pList);
-                    MessageBox.Show("Forbindelsen blev afbrudt af serveren");
-                }
-                else
-                    MessageBox.Show(se.Message);
-            }
+            client.sendmessage(msg);
         }
 
         // This method could be called by either the main thread or any of the
@@ -218,36 +160,14 @@ namespace ChatterClient
         }
         void ButtonDisconnectClick(object sender, System.EventArgs e)
         {
-            if (m_clientSocket != null)
+            if (client != null)
             {
-                m_clientSocket.Close();
-                m_clientSocket = null;
+                client.Close();
+                client = null;
                 UpdateControls(false);
             }
         }
-        //----------------------------------------------------	
-        // This is a helper function used (for convenience) to 
-        // get the IP address of the local machine
-        //----------------------------------------------------
-        String GetIP()
-        {
-            String strHostName = Dns.GetHostName();
-
-            // Find host by name
-            IPHostEntry iphostentry = Dns.GetHostEntry(strHostName);
-
-            // Grab the first IP addresses
-            String IPStr = "";
-            foreach (IPAddress ipaddress in iphostentry.AddressList)
-            {
-                if (ipaddress.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    IPStr = ipaddress.ToString();
-                    return IPStr;
-                }
-            }
-            return IPStr;
-        }
+        
 
         private void btnClear_Click(object sender, System.EventArgs e)
         {
@@ -258,60 +178,8 @@ namespace ChatterClient
         {
             if (e.KeyValue == 13)
             {
-                string msg = richTextTxMessage.Text;
-                richTextTxMessage.Text = "";
-                SendMessage(msg);
+                SendTextMsg();
                 e.Handled = true;
-            }
-
-        }
-
-        private void SendMessage(string msg)
-        {
-            string[] test = msg.Split(':');
-            List<byte> data = new List<byte>();
-            if (m_clientSocket == null)
-            {
-                MessageBox.Show("Sending is not possible when not connected!", "Sending", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            else
-            {
-                if (!m_clientSocket.Connected)
-                {
-                    MessageBox.Show("Sending is not possible when not connected!", "Sending", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            try
-            {
-                if(test[0] == "User")
-                {
-                    JavaScriptSerializer JSR = new JavaScriptSerializer();
-
-                    UserLogOn JsonMsg = new UserLogOn();
-                    JsonMsg.userName = test[1];
-                    JsonMsg.errorMessage = "None";
-                    
-
-                    msg = JSR.Serialize(JsonMsg);
-                }
-                //Use the following code to send bytes
-                data.Add((byte)0x2);
-                data.AddRange(System.Text.Encoding.UTF8.GetBytes(msg));
-                data.Add((byte)0x10);
-                data.Add((byte)0x3);
-                if (m_clientSocket != null)
-                {
-                    m_clientSocket.Send(data.ToArray());
-                }
-
-
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message);
             }
         }		
     }
