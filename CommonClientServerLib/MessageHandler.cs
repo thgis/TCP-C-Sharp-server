@@ -13,7 +13,7 @@ namespace CommonClientServerLib
         {
             JavaScriptSerializer JSR = new JavaScriptSerializer();
             IComMessage msg = null;
-            string msgStr = Encoding.ASCII.GetString(data.ToArray());
+            string msgStr = Encoding.UTF8.GetString(data.ToArray());
 
             Dictionary<string, object> test = (Dictionary<string, object>)JSR.DeserializeObject(msgStr);
 
