@@ -73,6 +73,7 @@
     <Compile Include="EventArgs.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
+    <Compile Include="Messages\GetNewMessages.cs" />
     <Compile Include="Messages\GetOnlineUsers.cs" />
     <Compile Include="Messages\IComMessage.cs" />
     <Compile Include="Messages\SendMessage.cs" />

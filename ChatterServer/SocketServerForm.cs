@@ -42,39 +42,27 @@ namespace ChatterServer
 
             switch (msg.type)
             {
-                case MessageType.SENDMESSAGE:
-                    {
-                        SendMessage sendMessage = (SendMessage)msg;
-                        PublishMessage pbMsg = new PublishMessage();
-                        pbMsg.message = sendMessage.message;
-                        pbMsg.sender = sendMessage.sender;
-                        pbMsg.timeStamp = (long)(DateTime.UtcNow - new DateTime(1970,1,1)).TotalMilliseconds;
-
-                        AppendToRichEditControl(message.ClientID.Name + " wrote: " + pbMsg.message + Environment.NewLine, richTextBoxReceivedMsg);
-                        
-                        server.BroadcastMsg(pbMsg);
-                    }
+                case MessageType.GETNEWMESSAGES:
+                    AppendToRichEditControl("Get New messages by: " + message.ClientID.Name,richTextBoxReceivedMsg);
                     break;
-                case MessageType.USERLOGON:
-                    {
-                        UserLogOn userMsg = (UserLogOn)msg;
-                        Add(message.ClientID, listBoxClientList);
-                        SetTextboxMsg(message.ClientID.Name + " connected.", textBoxMsg);
-                        
-                    }
+                case MessageType.SENDMESSAGE:
+                    SendMessage sendMessage = (SendMessage)msg;
+
+                    AppendToRichEditControl(message.ClientID.Name + " wrote: " + sendMessage.message, richTextBoxReceivedMsg);
                     break;
                 case MessageType.GETONLINEUSERS:
-                    GetOnlineUsers gou = (GetOnlineUsers)msg;
-                    gou.userList = new List<string>();
-                    foreach (ClientInfo item in listBoxClientList.Items)
-                    {
-                        gou.userList.Add(item.Name);
-                    }
-                    server.SendMsgToClient(gou,message.ClientID);
+                    AppendToRichEditControl("Get online users by: " + message.ClientID.Name, richTextBoxReceivedMsg);
+                    break;
+                case MessageType.USERLOGON:
+                    UserLogOn userMsg = (UserLogOn)msg;
+                    Add(message.ClientID, listBoxClientList);
+                    SetTextboxMsg(message.ClientID.Name + " connected.", textBoxMsg);
                     break;
                 case MessageType.NOMATCHINGTYPE:
+                    AppendToRichEditControl("Unknown message", richTextBoxReceivedMsg);
                     break;
                 default:
+                    AppendToRichEditControl("Unknown (default) message", richTextBoxReceivedMsg);
                     break;
             }
         }
@@ -247,7 +235,7 @@ namespace ChatterServer
                 // Hence we will use the invoke method on the control which will
                 // be called when the Main thread is free
                 // Do UI update on UI thread
-                object[] pList = { msg, richTextBox };
+                object[] pList = { msg + Environment.NewLine, richTextBox };
                 richTextBox.BeginInvoke(new UpdateRichEditCallback(AppendToRichEditControl), pList);
             }
             else
