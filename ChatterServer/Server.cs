@@ -123,6 +123,11 @@ namespace ChatterServer
                         returnMsg.errorMessage = "";
 
                         SendMsgToClient(returnMsg, message.ClientID);
+
+                        NewUserOnline nuo = new NewUserOnline();
+                        nuo.userName = message.ClientID.Name;
+
+                        BroadCastExceptSender(nuo,message.ClientID);
                     }
                     break;
                 case MessageType.GETNEWMESSAGES:
@@ -193,6 +198,15 @@ namespace ChatterServer
             foreach (Client item in m_workerSocketList.ToArray())
             {
                 item.SendMessage(msg);
+            }
+        }
+
+        public void BroadCastExceptSender(IComMessage msg, ClientInfo client)
+        {
+            foreach (Client item in m_workerSocketList.ToArray())
+            {
+                if(item.ClientInfo.ID != client.ID)
+                    item.SendMessage(msg);
             }
         }
 
