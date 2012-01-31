@@ -132,7 +132,7 @@ namespace ChatterServer
                         pm.message = "Logging of messages is not implented";
                         pm.timeStamp = GetTimeStamp();
 
-                        BroadcastMsg(pm);
+                        SendMsgToClient(pm, message.ClientID);
                     }
                     break;
                 case MessageType.NOMATCHINGTYPE:
