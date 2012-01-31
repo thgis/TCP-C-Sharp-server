@@ -64,8 +64,8 @@ namespace ChatterClient
 
         internal void Close()
         {
-            m_clientSocket.Close();
-            m_clientSocket = null;
+            if(m_clientSocket != null)
+                m_clientSocket.Close();
         }
 
         public bool connect(string Ip, string IPortNo, string UserName)
