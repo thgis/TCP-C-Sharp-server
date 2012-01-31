@@ -36,6 +36,9 @@ namespace CommonClientServerLib
                 case MessageType.PUBLISHMESSAGE:
                     msg = JSR.Deserialize<PublishMessage>(msgStr);
                     break;
+                case MessageType.GETNEWMESSAGES:
+                    msg = JSR.Deserialize<GetNewMessages>(msgStr);
+                    break;
                 default:
                     break;
             }
@@ -58,7 +61,8 @@ namespace CommonClientServerLib
     }
 
     public enum MessageType
-    {        
+    {
+        GETNEWMESSAGES = 6,
         SENDMESSAGE = 5,
         PUBLISHMESSAGE = 4,
         NEWUSERONLINE = 3,
