@@ -88,20 +88,71 @@ namespace ChatterServer
 
         void client_MessageReceived(object sender, MessageEvent message)
         {
-            if (message.GetMessage.type == MessageType.USERLOGON)
+            IComMessage msg = message.GetMessage;
+            switch (message.GetMessage.type)
             {
-                message.ClientID.Name = ((UserLogOn)message.GetMessage).userName;
+                case MessageType.SENDMESSAGE:
+                    {
+                        SendMessage sendMessage = (SendMessage)msg;
+                        PublishMessage pbMsg = new PublishMessage();
+                        pbMsg.message = sendMessage.message;
+                        pbMsg.sender = sendMessage.sender;
+                        pbMsg.timeStamp = GetTimeStamp();
 
-                UserLogOn returnMsg = (UserLogOn)message.GetMessage;
-                returnMsg.id = message.ClientID.ID;
-                returnMsg.success = true;
-                returnMsg.errorMessage = "";
+                        BroadcastMsg(pbMsg);
+                    }
+                    break;
+                case MessageType.GETONLINEUSERS:
+                    {
+                        GetOnlineUsers gou = (GetOnlineUsers)msg;
+                        gou.userList = new List<string>();
+                        foreach (Client item in m_workerSocketList)
+                        {
+                            gou.userList.Add(item.ClientInfo.Name);
+                        }
+                        SendMsgToClient(gou, message.ClientID);
+                    }
+                    break;
+                case MessageType.USERLOGON:
+                    {
+                        message.ClientID.Name = ((UserLogOn)message.GetMessage).userName;
 
-                SendMsgToClient(returnMsg, message.ClientID);
+                        UserLogOn returnMsg = (UserLogOn)message.GetMessage;
+                        returnMsg.id = message.ClientID.ID;
+                        returnMsg.success = true;
+                        returnMsg.errorMessage = "";
+
+                        SendMsgToClient(returnMsg, message.ClientID);
+
+                        NewUserOnline nuo = new NewUserOnline();
+                        nuo.userName = message.ClientID.Name;
+
+                        BroadCastExceptSender(nuo,message.ClientID);
+                    }
+                    break;
+                case MessageType.GETNEWMESSAGES:
+                    {
+                        PublishMessage pm = new PublishMessage();
+                        pm.sender = "Server";
+                        pm.message = "Logging of messages is not implented";
+                        pm.timeStamp = GetTimeStamp();
+
+                        SendMsgToClient(pm, message.ClientID);
+                    }
+                    break;
+                case MessageType.NOMATCHINGTYPE:
+                    break;
+                default:
+                    break;
             }
 
             if (clientReceivedMessageEvent != null)
                 clientReceivedMessageEvent(this, message);
+        }
+
+        private long GetTimeStamp()
+        {
+            return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
         }
 
         void client_DisconnectedEvent(object sender, EventArgs args)
@@ -147,6 +198,15 @@ namespace ChatterServer
             foreach (Client item in m_workerSocketList.ToArray())
             {
                 item.SendMessage(msg);
+            }
+        }
+
+        public void BroadCastExceptSender(IComMessage msg, ClientInfo client)
+        {
+            foreach (Client item in m_workerSocketList.ToArray())
+            {
+                if(item.ClientInfo.ID != client.ID)
+                    item.SendMessage(msg);
             }
         }
 

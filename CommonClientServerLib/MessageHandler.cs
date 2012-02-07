@@ -13,7 +13,7 @@ namespace CommonClientServerLib
         {
             JavaScriptSerializer JSR = new JavaScriptSerializer();
             IComMessage msg = null;
-            string msgStr = Encoding.ASCII.GetString(data.ToArray());
+            string msgStr = Encoding.UTF8.GetString(data.ToArray());
 
             Dictionary<string, object> test = (Dictionary<string, object>)JSR.DeserializeObject(msgStr);
 
@@ -36,8 +36,14 @@ namespace CommonClientServerLib
                 case MessageType.PUBLISHMESSAGE:
                     msg = JSR.Deserialize<PublishMessage>(msgStr);
                     break;
+
                 case MessageType.NEWUSERONLINE:
                     msg = JSR.Deserialize<NewUserOnline>(msgStr);
+                    break;
+
+                case MessageType.GETNEWMESSAGES:
+                    msg = JSR.Deserialize<GetNewMessages>(msgStr);
+
                     break;
                 default:
                     break;
@@ -52,7 +58,7 @@ namespace CommonClientServerLib
 
             List<byte> list = new List<byte>();
             list.Add(0x02);
-            list.AddRange(Encoding.ASCII.GetBytes(msg));
+            list.AddRange(Encoding.UTF8.GetBytes(msg));
             list.Add(0x10);
             list.Add(0x03);
 
@@ -61,7 +67,8 @@ namespace CommonClientServerLib
     }
 
     public enum MessageType
-    {        
+    {
+        GETNEWMESSAGES = 6,
         SENDMESSAGE = 5,
         PUBLISHMESSAGE = 4,
         NEWUSERONLINE = 3,

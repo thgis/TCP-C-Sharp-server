@@ -79,7 +79,6 @@ namespace ChatterClient
             if (client != null)
             {
                 client.Close();
-                client = null;
             }
             Close();
         }
@@ -168,7 +167,6 @@ namespace ChatterClient
             if (client != null)
             {
                 client.Close();
-                client = null;
                 UpdateControls(false);
             }
         }
