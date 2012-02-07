@@ -52,6 +52,11 @@ namespace ChatterClient
                     }
                     break;
                 case MessageType.NEWUSERONLINE:
+                    {
+                        NewUserOnline msg = (NewUserOnline)message.GetMessage;
+
+                        AppendToRichEditControl(msg.userName + " has logged on:-)");
+                    }
                     break;
                 case MessageType.GETONLINEUSERS:
                     break;

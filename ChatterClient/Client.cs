@@ -46,6 +46,10 @@ namespace ChatterClient
                     }
                     break;
                 case MessageType.NEWUSERONLINE:
+                    if (MessageReceived != null)
+                    {
+                        MessageReceived(this, new MessageEvent(msg, null));
+                    }
                     break;
                 case MessageType.GETONLINEUSERS:
                     break;
