@@ -97,6 +97,7 @@ namespace ChatterServer
                         PublishMessage pbMsg = new PublishMessage();
                         pbMsg.message = sendMessage.message;
                         pbMsg.sender = sendMessage.sender;
+                        pbMsg.receiver = sendMessage.receiver;
                         pbMsg.timeStamp = GetTimeStamp();
 
                         BroadcastMsg(pbMsg);
