@@ -52,6 +52,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.3.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -81,6 +82,7 @@
     <Compile Include="Messages\MessageEvent.cs" />
     <Compile Include="Messages\PublishMessage.cs" />
     <Compile Include="Messages\NewUserOnline.cs" />
+    <Compile Include="MySQLDBHandler.cs" />
     <Compile Include="NetHelper.cs" />
     <Compile Include="PacketHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
