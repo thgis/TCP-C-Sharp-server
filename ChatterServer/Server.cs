@@ -86,19 +86,22 @@ namespace ChatterServer
 			}	
 		}
 
-        void client_MessageReceived(object sender, MessageEvent message)
+        void client_MessageReceived(object sender, MessageEvent messageEvent)
         {
-            IComMessage msg = message.GetMessage;
-            switch (message.GetMessage.type)
+            IComMessage msg = messageEvent.GetMessage;
+            switch (msg.type)
             {
                 case MessageType.SENDMESSAGE:
                     {
                         SendMessage sendMessage = (SendMessage)msg;
+                        
+
                         PublishMessage pbMsg = new PublishMessage();
                         pbMsg.message = sendMessage.message;
                         pbMsg.sender = sendMessage.sender;
                         pbMsg.receiver = sendMessage.receiver;
-                        pbMsg.timeStamp = GetTimeStamp();
+
+                        MySQLDBHandler.SavePublisMsg(pbMsg);
 
                         BroadcastMsg(pbMsg);
                     }
@@ -111,34 +114,36 @@ namespace ChatterServer
                         {
                             gou.userList.Add(item.ClientInfo.Name);
                         }
-                        SendMsgToClient(gou, message.ClientID);
+                        SendMsgToClient(gou, messageEvent.ClientID);
                     }
                     break;
                 case MessageType.USERLOGON:
                     {
-                        message.ClientID.Name = ((UserLogOn)message.GetMessage).userName;
+                        messageEvent.ClientID.Name = ((UserLogOn)msg).userName;
 
-                        UserLogOn returnMsg = (UserLogOn)message.GetMessage;
-                        returnMsg.id = message.ClientID.ID;
+                        UserLogOn returnMsg = (UserLogOn)msg;
+                        returnMsg.id = messageEvent.ClientID.ID;
                         returnMsg.success = true;
                         returnMsg.errorMessage = "";
 
-                        SendMsgToClient(returnMsg, message.ClientID);
+                        SendMsgToClient(returnMsg, messageEvent.ClientID);
 
                         NewUserOnline nuo = new NewUserOnline();
-                        nuo.userName = message.ClientID.Name;
+                        nuo.userName = messageEvent.ClientID.Name;
 
-                        BroadCastExceptSender(nuo,message.ClientID);
+                        BroadCastExceptSender(nuo, messageEvent.ClientID);
                     }
                     break;
                 case MessageType.GETNEWMESSAGES:
                     {
-                        PublishMessage pm = new PublishMessage();
-                        pm.sender = "Server";
-                        pm.message = "Logging of messages is not implented";
-                        pm.timeStamp = GetTimeStamp();
+                        GetNewMessages getNewMessages = (GetNewMessages)msg;
 
-                        SendMsgToClient(pm, message.ClientID);
+                        List<PublishMessage> messages = MySQLDBHandler.GetStoredMessages(getNewMessages.lastSeenTimeStamp);
+
+                        foreach (var item in messages)
+                        {
+                            SendMsgToClient(item, messageEvent.ClientID);
+                        }
                     }
                     break;
                 case MessageType.NOMATCHINGTYPE:
@@ -148,13 +153,9 @@ namespace ChatterServer
             }
 
             if (clientReceivedMessageEvent != null)
-                clientReceivedMessageEvent(this, message);
+                clientReceivedMessageEvent(this, messageEvent);
         }
 
-        private long GetTimeStamp()
-        {
-            return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
-        }
 
         void client_DisconnectedEvent(object sender, EventArgs args)
         {
